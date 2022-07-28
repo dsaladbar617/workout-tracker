@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { TextInput, NumberInput, createStyles, Button } from "@mantine/core";
+import { NumberInput, createStyles, Button, Select } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import "../_styles/UserForm.css";
 import axios from "axios";
+import { useToggle } from "@mantine/hooks";
 
 const useStyles = createStyles((theme) => ({
 	root: {
@@ -22,10 +23,16 @@ const useStyles = createStyles((theme) => ({
 	}
 }));
 
-const addEntry = (name, sets, reps, date) => {
+const addEntry = (name, sets, reps, weight, date) => {
 	let url = "http://localhost:8080/api/add_entry";
 
-	let data = { exercise: name, sets: sets, reps: reps, date: date };
+	let data = {
+		exercise: name,
+		sets: sets,
+		reps: reps,
+		weight: weight,
+		date: date
+	};
 
 	axios
 		.post(url, data, {
@@ -48,29 +55,44 @@ const UserForm = () => {
 	const [name, setName] = useState("");
 	const [sets, setSets] = useState(0);
 	const [reps, setReps] = useState(0);
+	const [weight, setWeight] = useState(0);
 	const [date, setDate] = useState(new Date());
-	const [isEnabled, setIsEnabled] = useState(true);
+	const [value, toggle] = useToggle([false, true]);
+	let [names, setNames] = useState([]);
 
-	// useEffect(() => {
+	useEffect(() => {
+		let url = "http://localhost:8080/api/get_exercises";
+		axios
+			.get(url)
+			.then((data) => setNames(data.data.map((item) => item.exercise)));
+	}, []);
 
-	// }, []);
-
+	console.log(value);
+	console.log(value);
 	return (
 		<>
 			<div className="input-container">
-				<TextInput
+				<Select
 					placeholder="Input an exercise"
 					label="Exercise"
+					data={names.map((name, index) => ({
+						key: index,
+						value: name,
+						label: name
+					}))}
 					required
 					value={name}
-					onChange={(event) => setName(event.currentTarget.value)}
+					onChange={setName}
 					styles={{ root: classes.root, label: classes.label }}
+					transition="scale-y"
+					transitionDuration={220}
+					transitionTimingFunction="ease"
 				/>
 				<NumberInput
 					placeholder="Input sets"
 					label="Sets"
 					required
-					value={sets}
+					value={sets !== 0 ? sets : null}
 					onChange={setSets}
 					min={0}
 					styles={{ root: classes.root, label: classes.label }}
@@ -79,8 +101,17 @@ const UserForm = () => {
 					placeholder="Input reps"
 					label="Reps"
 					required
-					value={reps}
+					value={reps !== 0 ? reps : null}
 					onChange={setReps}
+					min={0}
+					styles={{ root: classes.root, label: classes.label }}
+				/>
+				<NumberInput
+					placeholder="Input weight"
+					label="Weight"
+					required
+					value={weight !== 0 ? weight : null}
+					onChange={setWeight}
 					min={0}
 					styles={{ root: classes.root, label: classes.label }}
 				/>
@@ -97,7 +128,8 @@ const UserForm = () => {
 				<Button
 					color="gray"
 					onClick={() => {
-						addEntry(name, sets, reps, date);
+						console.log(date);
+						addEntry(name, sets, reps, weight, date);
 					}}>
 					Submit
 				</Button>

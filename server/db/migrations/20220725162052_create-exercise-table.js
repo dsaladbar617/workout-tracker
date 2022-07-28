@@ -8,6 +8,7 @@ export function up(knex) {
 		table.string("exercise", 255);
 		table.integer("sets");
 		table.integer("reps");
+		table.integer("weight");
 		table.date("date", { precision: 6 }).defaultTo(knex.fn.now(6));
 	});
 }

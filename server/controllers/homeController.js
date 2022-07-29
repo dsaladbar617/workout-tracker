@@ -9,16 +9,17 @@ const add = (req, res) => {
 			exercise: entry.exercise,
 			sets: entry.sets,
 			reps: entry.reps,
+			weight: entry.weight,
 			date: entry.date
 		})
 		.then(() => {
-			res.status(201).json("you suck");
+			res.status(201).json("entry added");
 		});
 };
 
 const requestExercises = (req, res) => {
 	knex("exercise")
-		.select("exercise")
+		.distinct("exercise")
 		.then((data) => {
 			res.status(200).json(data);
 		});

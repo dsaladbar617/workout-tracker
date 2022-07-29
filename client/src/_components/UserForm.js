@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { NumberInput, createStyles, Button, Select } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import "../_styles/UserForm.css";
 import axios from "axios";
-import { useToggle } from "@mantine/hooks";
+import { DataContext } from "../DataContext";
 
 const useStyles = createStyles((theme) => ({
 	root: {
@@ -33,7 +33,6 @@ const addEntry = (name, sets, reps, weight, date) => {
 		weight: weight,
 		date: date
 	};
-
 	axios
 		.post(url, data, {
 			headers: {
@@ -42,22 +41,18 @@ const addEntry = (name, sets, reps, weight, date) => {
 			}
 		})
 		.then((data) => console.log(data));
-
-	// fetch('localhost:8080/api/add_entry', {
-	// 	method: "POST",
-
-	// })
 };
 
 const UserForm = () => {
 	const { classes } = useStyles();
+	const { values, setters } = useContext(DataContext);
 
 	const [name, setName] = useState("");
 	const [sets, setSets] = useState(0);
 	const [reps, setReps] = useState(0);
 	const [weight, setWeight] = useState(0);
 	const [date, setDate] = useState(new Date());
-	const [value, toggle] = useToggle([false, true]);
+	// const [value, toggle] = useToggle([false, true]);
 	let [names, setNames] = useState([]);
 
 	useEffect(() => {
@@ -67,8 +62,6 @@ const UserForm = () => {
 			.then((data) => setNames(data.data.map((item) => item.exercise)));
 	}, []);
 
-	console.log(value);
-	console.log(value);
 	return (
 		<>
 			<div className="input-container">
@@ -81,6 +74,15 @@ const UserForm = () => {
 						label: name
 					}))}
 					required
+					searchable
+					creatable
+					getCreateLabel={(query) => `+ Create ${query}`}
+					onCreate={(query) => {
+						const item = { value: query, label: query };
+						// console.log(names);
+						setNames((current) => [...current, item.exercise]);
+						return item;
+					}}
 					value={name}
 					onChange={setName}
 					styles={{ root: classes.root, label: classes.label }}
@@ -130,6 +132,7 @@ const UserForm = () => {
 					onClick={() => {
 						console.log(date);
 						addEntry(name, sets, reps, weight, date);
+						setters.setRefreshChart(true);
 					}}>
 					Submit
 				</Button>

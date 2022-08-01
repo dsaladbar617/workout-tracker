@@ -19,7 +19,8 @@ const add = (req, res) => {
 
 const requestExercises = (req, res) => {
 	knex("exercise")
-		.distinct("exercise")
+		.distinct("exercise", "group")
+		// .select("*")
 		.then((data) => {
 			res.status(200).json(data);
 		});

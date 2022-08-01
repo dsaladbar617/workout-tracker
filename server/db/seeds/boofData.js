@@ -8,20 +8,23 @@ export async function seed(knex) {
 	await knex("exercise").insert([
 		{
 			exercise: "bench press",
+			group: "upper",
 			sets: 3,
 			reps: 5,
 			weight: 25,
 			date: "Jul 24 2022"
 		},
 		{
-			exercise: "bench press",
+			exercise: "squat",
+			group: "lower",
 			sets: 4,
 			reps: 5,
 			weight: 25,
 			date: "Jul 25 2022"
 		},
 		{
-			exercise: "bench press",
+			exercise: "deadlift",
+			group: "lower",
 			sets: 5,
 			reps: 5,
 			weight: 25,
@@ -29,6 +32,7 @@ export async function seed(knex) {
 		},
 		{
 			exercise: "bench press",
+			group: "upper",
 			sets: 5,
 			reps: 7,
 			weight: 25,
@@ -36,6 +40,7 @@ export async function seed(knex) {
 		},
 		{
 			exercise: "bench press",
+			group: "upper",
 			sets: 5,
 			reps: 8,
 			weight: 25,
@@ -43,6 +48,7 @@ export async function seed(knex) {
 		},
 		{
 			exercise: "bench press",
+			group: "upper",
 			sets: 5,
 			reps: 5,
 			weight: 35,

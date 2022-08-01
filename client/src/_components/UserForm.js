@@ -52,15 +52,17 @@ const UserForm = () => {
 	const [reps, setReps] = useState(0);
 	const [weight, setWeight] = useState(0);
 	const [date, setDate] = useState(new Date());
-	// const [value, toggle] = useToggle([false, true]);
 	let [names, setNames] = useState([]);
 
 	useEffect(() => {
 		let url = "http://localhost:8080/api/get_exercises";
-		axios
-			.get(url)
-			.then((data) => setNames(data.data.map((item) => item.exercise)));
-	}, []);
+		axios.get(url).then((data) => {
+			setNames(
+				data.data.map((item) => ({ name: item.exercise, group: item.group }))
+			);
+			console.log(data);
+		});
+	}, [values.submitted]);
 
 	return (
 		<>
@@ -70,19 +72,20 @@ const UserForm = () => {
 					label="Exercise"
 					data={names.map((name, index) => ({
 						key: index,
-						value: name,
-						label: name
+						value: name.name,
+						label: name.name,
+						group: name.group
 					}))}
 					required
 					searchable
-					creatable
-					getCreateLabel={(query) => `+ Create ${query}`}
-					onCreate={(query) => {
-						const item = { value: query, label: query };
-						// console.log(names);
-						setNames((current) => [...current, item.exercise]);
-						return item;
-					}}
+					nothingFound="No options"
+					// creatable
+					// getCreateLabel={(query) => `+ Create ${query}`}
+					// onCreate={(query) => {
+					// 	const item = { value: query, label: query };
+					// 	setNames((current) => [...current, query]);
+					// 	return item;
+					// }}
 					value={name}
 					onChange={setName}
 					styles={{ root: classes.root, label: classes.label }}
@@ -133,6 +136,7 @@ const UserForm = () => {
 						console.log(date);
 						addEntry(name, sets, reps, weight, date);
 						setters.setRefreshChart(true);
+						setters.setSubmitted(true);
 					}}>
 					Submit
 				</Button>

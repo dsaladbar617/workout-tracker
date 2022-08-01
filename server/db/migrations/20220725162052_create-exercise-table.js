@@ -6,6 +6,7 @@ export function up(knex) {
 	return knex.schema.createTable("exercise", (table) => {
 		table.increments();
 		table.string("exercise", 255);
+		table.string("group", 255);
 		table.integer("sets");
 		table.integer("reps");
 		table.integer("weight");

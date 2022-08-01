@@ -5,15 +5,18 @@ const DataContext = React.createContext([]);
 const DataProvider = ({ children }) => {
 	const [data, setData] = useState([]);
 	const [refreshChart, setRefreshChart] = useState(false);
+	const [submitted, setSubmitted] = useState(false);
 
 	const values = {
 		data,
-		refreshChart
+		refreshChart,
+		submitted
 	};
 
 	const setters = {
 		setData,
-		setRefreshChart
+		setRefreshChart,
+		setSubmitted
 	};
 
 	return (

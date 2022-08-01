@@ -16,19 +16,18 @@ import { DataContext } from "../DataContext";
 
 const Chart = () => {
 	let [names, setNames] = useState([]);
-	// let [chartData, setChartData] = useState([]);
 	const { values, setters } = useContext(DataContext);
+	const [value, setValue] = useState("");
+	const [chartData, setChartData] = useState([]);
 
 	useEffect(() => {
 		let url = "http://localhost:8080/api/get_exercises";
 		axios
 			.get(url)
 			.then((data) => setNames(data.data.map((item) => item.exercise)));
-	}, []);
 
-	useEffect(() => {
 		let dataUrl = "http://localhost:8080/api/get_data";
-		axios.get(dataUrl).then((response) =>
+		axios.get(dataUrl).then((response) => {
 			setters.setData(
 				response.data.map((item) => ({
 					...item,
@@ -38,47 +37,75 @@ const Chart = () => {
 					}),
 					total: item.sets * item.reps * item.weight
 				}))
-			)
-		);
-		console.log(values.data);
-		setters.setRefreshChart(false);
-	}, [values.refreshChart]);
+			);
+			setChartData(values.data);
+			setters.setSubmitted(false);
+		});
+	}, [values.submitted]);
+
+	useEffect(() => {
+		setChartData(values.data);
+	}, [values.data]);
+
+	useEffect(() => {
+		if (value !== null) {
+			setChartData(values.data.filter((item) => item.exercise === value));
+		} else {
+			setChartData(values.data);
+		}
+	}, [value]);
+
+	let namesData = names.map((name, index) => ({
+		key: index,
+		value: name,
+		label: name
+	}));
 
 	return (
 		<div className="chart-container">
 			<div className="chart">
 				<Select
+					clearable
 					label="Exercise"
 					placeholder="Pick one"
-					data={names.map((name, index) => ({
-						key: index,
-						value: name,
-						label: name
-					}))}
-					// onChange={}
+					data={namesData}
+					value={value}
+					onChange={(event) => {
+						console.log(event);
+						setValue(event);
+					}}
 					transition="scale-y"
 					transitionDuration={220}
 					transitionTimingFunction="ease"
 				/>
-				{values.data.length > 0 ? (
-					<ResponsiveContainer width={"70%"} height={600}>
-						<LineChart
-							width={500}
-							height={500}
-							data={values.data}
-							margin={{ top: 15, right: 30, left: 20, bottom: 5 }}>
-							<XAxis dataKey="date">
-								{/* <Label value="name" offset={-5} position="insideBottom" /> */}
-							</XAxis>
-							<YAxis />
-							<CartesianGrid />
-							<Tooltip />
-							<Line type="monotone" dataKey="total" stroke="#8884d8" />
-							{/* <Line type="monotone" dataKey="reps" stroke="#8884d8" />
-							<Line type="monotone" dataKey="sets" stroke="#8884d8" /> */}
-						</LineChart>
-					</ResponsiveContainer>
-				) : null}
+				<ResponsiveContainer width={"70%"} height={500}>
+					<LineChart
+						width={500}
+						height={500}
+						data={chartData}
+						margin={{ top: 15, right: 30, left: 20, bottom: 15 }}>
+						<XAxis dataKey="date">
+							<Label value="Date" offset={-5} position="insideBottom" />
+						</XAxis>
+						<YAxis
+							label={{
+								value: "Total Weight",
+								angle: -90,
+								position: "left"
+							}}></YAxis>
+						<CartesianGrid strokeDasharray="3 5" />
+						<Tooltip />
+						{chartData.length > 0 ? (
+							<Line
+								type="monotone"
+								dataKey="total"
+								stroke="#8884d8"
+								strokeWidth={3}
+								dot={{ stroke: "black", strokeWidth: 2 }}
+							/>
+						) : null}
+					</LineChart>
+				</ResponsiveContainer>
 			</div>
 		</div>
 	);

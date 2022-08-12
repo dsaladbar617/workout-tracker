@@ -48,10 +48,11 @@ const UserForm = () => {
 	const { values, setters } = useContext(DataContext);
 
 	const [name, setName] = useState("");
-	const [sets, setSets] = useState(0);
-	const [reps, setReps] = useState(0);
-	const [weight, setWeight] = useState(0);
+	const [sets, setSets] = useState(undefined);
+	const [reps, setReps] = useState(undefined);
+	const [weight, setWeight] = useState(undefined);
 	const [date, setDate] = useState(new Date());
+	const [isDisabled, setIsDisabled] = useState(true);
 	let [names, setNames] = useState([]);
 
 	useEffect(() => {
@@ -63,6 +64,21 @@ const UserForm = () => {
 			console.log(data);
 		});
 	}, [values.submitted]);
+
+	useEffect(() => {
+		if (
+			name !== "" &&
+			sets !== undefined &&
+			reps !== undefined &&
+			weight !== undefined
+		) {
+			console.log("should enable");
+			setIsDisabled(false);
+		} else {
+			console.log("not");
+			setIsDisabled(true);
+		}
+	}, [name, sets, reps, weight]);
 
 	return (
 		<>
@@ -132,6 +148,7 @@ const UserForm = () => {
 			<div className="sub-butt">
 				<Button
 					color="gray"
+					disabled={isDisabled}
 					onClick={() => {
 						console.log(date);
 						addEntry(name, sets, reps, weight, date);
